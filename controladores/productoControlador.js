@@ -40,3 +40,26 @@ exports.eliminarProducto = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// Obtener productos con paginación
+exports.obtenerProductos = async (req, res) => {
+    const page = parseInt(req.query.page) || 1; // Página actual, por defecto es la página 1
+    const limit = parseInt(req.query.limit) || 6; // Límite de productos por página, por defecto 9
+  
+    try {
+      const productos = await Producto.find()
+        .skip((page - 1) * limit) // Saltar productos según la página
+        .limit(limit); // Limitar la cantidad de productos
+  
+      const totalProductos = await Producto.countDocuments(); // Total de productos
+  
+      res.status(200).json({
+        productos,
+        totalPages: Math.ceil(totalProductos / limit), // Total de páginas
+        currentPage: page,
+      });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  };
+  
