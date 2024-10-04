@@ -41,21 +41,37 @@ exports.eliminarProducto = async (req, res) => {
   }
 };
 
-// Obtener productos con paginación
+// Obtener productos con paginación y búsqueda
 exports.obtenerProductos = async (req, res) => {
     const page = parseInt(req.query.page) || 1; // Página actual, por defecto es la página 1
-    const limit = parseInt(req.query.limit) || 6; // Límite de productos por página, por defecto 9
+    const limit = parseInt(req.query.limit) || 6; // Límite de productos por página, por defecto 6
+    const query = req.query.query || ''; // Parámetro de búsqueda, por defecto vacío
   
     try {
-      const productos = await Producto.find()
-        .skip((page - 1) * limit) // Saltar productos según la página
-        .limit(limit); // Limitar la cantidad de productos
+      const regex = new RegExp(query, 'i'); // Expresión regular para la búsqueda (insensible a mayúsculas)
+      
+      // Filtrar productos según el nombre, la descripción o la categoría
+      const productos = await Producto.find({
+        $or: [
+          { nombre: { $regex: regex } },
+          { descripcion: { $regex: regex } },
+          { categoria: { $regex: regex } }
+        ]
+      })
+        .skip((page - 1) * limit)
+        .limit(limit);
   
-      const totalProductos = await Producto.countDocuments(); // Total de productos
+      const totalProductos = await Producto.countDocuments({
+        $or: [
+          { nombre: { $regex: regex } },
+          { descripcion: { $regex: regex } },
+          { categoria: { $regex: regex } }
+        ]
+      });
   
       res.status(200).json({
         productos,
-        totalPages: Math.ceil(totalProductos / limit), // Total de páginas
+        totalPages: Math.ceil(totalProductos / limit),
         currentPage: page,
       });
     } catch (error) {
