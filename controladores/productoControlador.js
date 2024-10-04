@@ -41,33 +41,26 @@ exports.eliminarProducto = async (req, res) => {
   }
 };
 
-// Obtener productos con paginación y búsqueda
+// Obtener productos con paginación, búsqueda y filtro por categoría
 exports.obtenerProductos = async (req, res) => {
     const page = parseInt(req.query.page) || 1; // Página actual, por defecto es la página 1
     const limit = parseInt(req.query.limit) || 6; // Límite de productos por página, por defecto 6
     const query = req.query.query || ''; // Parámetro de búsqueda, por defecto vacío
+    const categoria = req.query.categoria || ''; // Parámetro de filtro por categoría
   
     try {
       const regex = new RegExp(query, 'i'); // Expresión regular para la búsqueda (insensible a mayúsculas)
       
-      // Filtrar productos según el nombre, la descripción o la categoría
-      const productos = await Producto.find({
-        $or: [
-          { nombre: { $regex: regex } },
-          { descripcion: { $regex: regex } },
-          { categoria: { $regex: regex } }
-        ]
-      })
+      // Filtro por categoría si se especifica
+      const filtro = categoria 
+        ? { $and: [{ categoria }, { $or: [{ nombre: { $regex: regex } }, { descripcion: { $regex: regex } }] }] }
+        : { $or: [{ nombre: { $regex: regex } }, { descripcion: { $regex: regex } }, { categoria: { $regex: regex } }] };
+  
+      const productos = await Producto.find(filtro)
         .skip((page - 1) * limit)
         .limit(limit);
   
-      const totalProductos = await Producto.countDocuments({
-        $or: [
-          { nombre: { $regex: regex } },
-          { descripcion: { $regex: regex } },
-          { categoria: { $regex: regex } }
-        ]
-      });
+      const totalProductos = await Producto.countDocuments(filtro);
   
       res.status(200).json({
         productos,
@@ -78,4 +71,5 @@ exports.obtenerProductos = async (req, res) => {
       res.status(500).json({ message: error.message });
     }
   };
+  
   
