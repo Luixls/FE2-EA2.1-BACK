@@ -1,4 +1,5 @@
 // servidor.js
+require("dotenv").config({ path: "./config.env" });
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -6,7 +7,7 @@ const productoRutas = require("./rutas/productoRutas");
 const authRutas = require("./rutas/authRutas"); // Importar las rutas de autenticación
 const { crearAdminSiNoExiste } = require("./controladores/adminControlador"); // Importar el controlador del admin
 const usuarioRutas = require("./rutas/usuarioRutas");
-require("dotenv").config({ path: "./config.env" });
+const favoritosRutas = require("./rutas/favoritosRutas");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use("/api", productoRutas);
 app.use("/api/auth", authRutas); // Agregando las rutas de autenticación
 app.use("/api/usuarios", usuarioRutas);
+app.use("/api/favoritos", favoritosRutas);
 
 // Conectar a la base de datos
 mongoose
