@@ -1,8 +1,7 @@
-// controladores/authControlador.js
-const Usuario = require('../modelos/usuarioModelo');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const { validationResult } = require('express-validator');
+const Usuario = require("../modelos/usuarioModelo");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const { validationResult } = require("express-validator");
 
 // Función para generar el token JWT
 const generarToken = (usuarioId) => {
@@ -15,26 +14,37 @@ const generarToken = (usuarioId) => {
 exports.registrarUsuario = async (req, res) => {
   const errores = validationResult(req);
   if (!errores.isEmpty()) {
-    return res.status(400).json({ errores: errores.array() });
+    return res
+      .status(400)
+      .json({
+        mensaje: "Hay errores en los datos proporcionados",
+        errores: errores.array(),
+      });
   }
 
-  const { nombreUsuario, nombreCompleto, email, contraseña, confirmarContraseña } = req.body;
+  const {
+    nombreUsuario,
+    nombreCompleto,
+    email,
+    contraseña,
+    confirmarContraseña,
+  } = req.body;
 
   try {
     if (contraseña !== confirmarContraseña) {
-      return res.status(400).json({ mensaje: 'Las contraseñas no coinciden' });
+      return res.status(400).json({ mensaje: "Las contraseñas no coinciden" });
     }
 
     let usuario = await Usuario.findOne({ email });
     if (usuario) {
-      return res.status(400).json({ mensaje: 'El email ya está registrado' });
+      return res.status(400).json({ mensaje: "El email ya está registrado" });
     }
 
     usuario = new Usuario({
       nombreUsuario,
       nombreCompleto,
       email,
-      contraseña
+      contraseña,
     });
 
     await usuario.save();
@@ -43,7 +53,7 @@ exports.registrarUsuario = async (req, res) => {
     res.status(201).json({ token });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ mensaje: 'Error en el servidor' });
+    res.status(500).json({ mensaje: "Error en el servidor" });
   }
 };
 
@@ -54,18 +64,18 @@ exports.loginUsuario = async (req, res) => {
   try {
     const usuario = await Usuario.findOne({ email });
     if (!usuario) {
-      return res.status(400).json({ mensaje: 'Credenciales inválidas' });
+      return res.status(400).json({ mensaje: "Credenciales inválidas" });
     }
 
     const esMatch = await usuario.compararContraseña(contraseña);
     if (!esMatch) {
-      return res.status(400).json({ mensaje: 'Credenciales inválidas' });
+      return res.status(400).json({ mensaje: "Credenciales inválidas" });
     }
 
     const token = generarToken(usuario._id);
     res.json({ token });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ mensaje: 'Error en el servidor' });
+    res.status(500).json({ mensaje: "Error en el servidor" });
   }
 };

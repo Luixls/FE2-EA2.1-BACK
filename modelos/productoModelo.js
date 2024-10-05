@@ -1,5 +1,5 @@
 // modelos/productoModelo.js
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const productoEsquema = new mongoose.Schema({
   nombre: { type: String, required: true },
@@ -7,9 +7,9 @@ const productoEsquema = new mongoose.Schema({
   descripcion: String,
   precio: { type: Number, required: true },
   cantidad: { type: Number, required: true },
-  imagen: String
+  imagen: String,
 });
 
-const Producto = mongoose.model('Producto', productoEsquema);
+const Producto = mongoose.model("Producto", productoEsquema);
 
 module.exports = Producto;
