@@ -1,6 +1,6 @@
 // controladores/usuarioControlador.js
+
 const Usuario = require("../modelos/usuarioModelo");
-const bcrypt = require("bcryptjs");
 
 // Obtener los datos del usuario por su ID
 exports.obtenerUsuario = async (req, res) => {
@@ -13,6 +13,17 @@ exports.obtenerUsuario = async (req, res) => {
   } catch (error) {
     console.error("Error al obtener los datos del usuario", error);
     res.status(500).json({ mensaje: "Error al obtener los datos del usuario" });
+  }
+};
+
+// Obtener todos los usuarios (solo para admins)
+exports.obtenerUsuarios = async (req, res) => {
+  try {
+    const usuarios = await Usuario.find().select("-contraseña"); // No mostramos las contraseñas
+    res.json(usuarios);
+  } catch (error) {
+    console.error("Error al obtener los usuarios", error);
+    res.status(500).json({ mensaje: "Error al obtener los usuarios" });
   }
 };
 
