@@ -1,3 +1,4 @@
+// rutas/productoRutas.js
 const express = require('express');
 const { crearProducto, obtenerProductos, actualizarProducto, eliminarProducto } = require('../controladores/productoControlador');
 const router = express.Router();

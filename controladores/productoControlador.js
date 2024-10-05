@@ -1,3 +1,4 @@
+// controladores/productoControlador.js
 const Producto = require('../modelos/productoModelo');
 
 // Crear un producto
