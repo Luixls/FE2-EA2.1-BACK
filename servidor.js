@@ -3,8 +3,9 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const productoRutas = require("./rutas/productoRutas");
-const authRutas = require("./rutas/authRutas"); // Importa las rutas de autenticación
-const { crearAdminSiNoExiste } = require("./controladores/adminControlador"); // Importa el controlador del admin
+const authRutas = require("./rutas/authRutas"); // Importar las rutas de autenticación
+const { crearAdminSiNoExiste } = require("./controladores/adminControlador"); // Importar el controlador del admin
+const usuarioRutas = require("./rutas/usuarioRutas");
 require("dotenv").config({ path: "./config.env" });
 
 const app = express();
@@ -15,7 +16,8 @@ app.use(express.json());
 
 // Rutas
 app.use("/api", productoRutas);
-app.use("/api/auth", authRutas); // Agrega las rutas de autenticación
+app.use("/api/auth", authRutas); // Agregando las rutas de autenticación
+app.use("/api/usuarios", usuarioRutas);
 
 // Conectar a la base de datos
 mongoose
