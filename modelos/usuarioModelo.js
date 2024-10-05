@@ -10,12 +10,18 @@ const usuarioSchema = new mongoose.Schema({
   },
   nombreCompleto: {
     type: String,
-    required: [true, "Por favor ingresa el nombre y apellido"],
+    required: [true, "Por favor ingresa el nombre completo"],
   },
   email: {
     type: String,
     required: [true, "Por favor ingresa un email"],
     unique: true,
+  },
+  direccion: {
+    type: String,
+  },
+  telefono: {
+    type: String,
   },
   contraseña: {
     type: String,
@@ -35,10 +41,16 @@ const usuarioSchema = new mongoose.Schema({
 // Hash de la contraseña antes de guardarla en la base de datos
 usuarioSchema.pre("save", async function (next) {
   if (!this.isModified("contraseña")) {
-    next();
+    return next(); // Si la contraseña no ha sido modificada, no la hasheamos de nuevo
   }
-  const salt = await bcrypt.genSalt(10);
-  this.contraseña = await bcrypt.hash(this.contraseña, salt);
+
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.contraseña = await bcrypt.hash(this.contraseña, salt);
+    next();
+  } catch (error) {
+    return next(error); // En caso de error, pasamos el control con el error
+  }
 });
 
 // Método para verificar la contraseña

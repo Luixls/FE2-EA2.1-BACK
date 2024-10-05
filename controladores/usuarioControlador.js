@@ -1,49 +1,55 @@
 // controladores/usuarioControlador.js
-const Usuario = require('../modelos/usuarioModelo');
+const Usuario = require("../modelos/usuarioModelo");
+const bcrypt = require("bcryptjs");
 
-// Obtener todos los usuarios (solo para admins)
-exports.obtenerUsuarios = async (req, res) => {
-  try {
-    const usuarios = await Usuario.find().select('-contraseña');
-    res.json(usuarios);
-  } catch (error) {
-    res.status(500).json({ mensaje: 'Error al obtener usuarios' });
-  }
-};
-
-// Obtener un usuario (para perfil propio o admin)
+// Obtener los datos del usuario por su ID
 exports.obtenerUsuario = async (req, res) => {
   try {
-    const usuario = await Usuario.findById(req.params.id).select('-contraseña');
+    const usuario = await Usuario.findById(req.params.id).select("-contraseña");
+    if (!usuario) {
+      return res.status(404).json({ mensaje: "Usuario no encontrado" });
+    }
     res.json(usuario);
   } catch (error) {
-    res.status(500).json({ mensaje: 'Error al obtener usuario' });
+    console.error("Error al obtener los datos del usuario", error);
+    res.status(500).json({ mensaje: "Error al obtener los datos del usuario" });
   }
 };
 
-// Actualizar un usuario
-exports.actualizarUsuario = async (req, res) => {
-  const { nombreCompleto, email, contraseña, direccion, telefono } = req.body;
-
+// Actualizar los datos del perfil del usuario
+exports.actualizarPerfilUsuario = async (req, res) => {
   try {
-    const usuario = await Usuario.findById(req.params.id);
+    const {
+      nombreCompleto,
+      direccion,
+      telefono,
+      nombreUsuario,
+      email,
+      nuevaContraseña,
+    } = req.body;
+
+    let usuario = await Usuario.findById(req.params.id);
 
     if (!usuario) {
-      return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+      return res.status(404).json({ mensaje: "Usuario no encontrado" });
     }
 
+    // Actualizar los campos permitidos
     usuario.nombreCompleto = nombreCompleto || usuario.nombreCompleto;
-    usuario.email = email || usuario.email;
     usuario.direccion = direccion || usuario.direccion;
     usuario.telefono = telefono || usuario.telefono;
+    usuario.nombreUsuario = nombreUsuario || usuario.nombreUsuario;
+    usuario.email = email || usuario.email;
 
-    if (contraseña) {
-      usuario.contraseña = contraseña;
+    // Si se proporciona una nueva contraseña, se actualiza
+    if (nuevaContraseña) {
+      usuario.contraseña = nuevaContraseña; // La contraseña será hasheada en el middleware 'pre("save")'
     }
 
     await usuario.save();
-    res.json({ mensaje: 'Usuario actualizado correctamente' });
+    res.json({ mensaje: "Perfil actualizado correctamente", usuario });
   } catch (error) {
-    res.status(500).json({ mensaje: 'Error al actualizar usuario' });
+    console.error("Error al actualizar el perfil", error);
+    res.status(500).json({ mensaje: "Error al actualizar el perfil" });
   }
 };
