@@ -3,7 +3,9 @@ const express = require("express");
 const {
   registrarUsuario,
   loginUsuario,
+  obtenerUsuarioAutenticado,
 } = require("../controladores/authControlador");
+const { proteger } = require("../middlewares/authMiddleware");
 const { check } = require("express-validator");
 
 const router = express.Router();
@@ -29,5 +31,8 @@ router.post(
   ],
   loginUsuario
 );
+
+// Nueva ruta para obtener los datos del usuario autenticado
+router.get("/me", proteger, obtenerUsuarioAutenticado);
 
 module.exports = router;

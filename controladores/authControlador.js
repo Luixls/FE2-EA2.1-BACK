@@ -1,3 +1,4 @@
+// controladores/authControlador.js
 const Usuario = require("../modelos/usuarioModelo");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -14,12 +15,10 @@ const generarToken = (usuarioId) => {
 exports.registrarUsuario = async (req, res) => {
   const errores = validationResult(req);
   if (!errores.isEmpty()) {
-    return res
-      .status(400)
-      .json({
-        mensaje: "Hay errores en los datos proporcionados",
-        errores: errores.array(),
-      });
+    return res.status(400).json({
+      mensaje: "Hay errores en los datos proporcionados",
+      errores: errores.array(),
+    });
   }
 
   const {
@@ -77,5 +76,18 @@ exports.loginUsuario = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ mensaje: "Error en el servidor" });
+  }
+};
+
+// Obtener los datos del usuario autenticado
+exports.obtenerUsuarioAutenticado = async (req, res) => {
+  try {
+    const usuario = await Usuario.findById(req.usuario.id).select(
+      "-contraseña"
+    );
+    res.status(200).json(usuario);
+  } catch (error) {
+    console.error("Error al obtener los datos del usuario", error);
+    res.status(500).json({ mensaje: "Error al obtener los datos del usuario" });
   }
 };
