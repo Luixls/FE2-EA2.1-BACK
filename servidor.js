@@ -4,10 +4,10 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const productoRutas = require("./rutas/productoRutas");
-const authRutas = require("./rutas/authRutas"); // Importar las rutas de autenticación
-const { crearAdminSiNoExiste } = require("./controladores/adminControlador"); // Importar el controlador del admin
+const authRutas = require("./rutas/authRutas");
 const usuarioRutas = require("./rutas/usuarioRutas");
 const favoritosRutas = require("./rutas/favoritosRutas");
+const { crearAdminSiNoExiste } = require("./controladores/adminControlador");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -17,7 +17,7 @@ app.use(express.json());
 
 // Rutas
 app.use("/api", productoRutas);
-app.use("/api/auth", authRutas); // Agregando las rutas de autenticación
+app.use("/api/auth", authRutas);
 app.use("/api/usuarios", usuarioRutas);
 app.use("/api/favoritos", favoritosRutas);
 
